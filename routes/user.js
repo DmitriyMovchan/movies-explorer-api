@@ -6,9 +6,6 @@ const {
 } = require('../controllers/user');
 const { isAuthorized } = require('../middlewares/auth');
 
-// router.post('/signup', createUser);
-// router.post('/signin', login);
-
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
