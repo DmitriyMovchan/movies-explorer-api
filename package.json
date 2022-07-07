@@ -1,7 +1,7 @@
 {
   "name": "express-mesto-gha",
   "version": "1.0.0",
-  "description": "[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)\r # Проект Mesto фронтенд + бэкенд",
+  "description": "# Проект movies бэкенд",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/DmitriyMovchan/express-mesto-gha.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Dmitriy Movchan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/DmitriyMovchan/express-mesto-gha/issues"
@@ -26,6 +26,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-rate-limit": "^6.4.0",
     "express-winston": "^4.2.0",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",

@@ -17,7 +17,6 @@ const getMovies = (req, res, next) => {
 
 // eslint-disable-next-line consistent-return
 const createMovies = (req, res, next) => {
-  console.log(req.body);
   const {
     country,
     director,
@@ -61,7 +60,6 @@ const createMovies = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  console.log(req);
   Movie.findById(req.params.movieId)
     // eslint-disable-next-line consistent-return
     .then((movie) => {
@@ -71,14 +69,13 @@ const deleteMovie = (req, res, next) => {
         // return;
       }
       if (movie.owner.toString() === req.user._id) {
-        Movie.deleteOne(movie)
+        return Movie.deleteOne(movie)
           .then(() => {
             res.status(200).send({ message: 'Фильм удален' });
           });
-      } else {
-        return next(new Forbidden('Вы пытались удалить чужой фильм'));
-        // res.status(403).send({ message: 'Чужие карточки удалять нельзя' });
       }
+      return next(new Forbidden('Вы пытались удалить чужой фильм'));
+      // res.status(403).send({ message: 'Чужие карточки удалять нельзя' });
     })
   // eslint-disable-next-line consistent-return
     .catch((err) => {
