@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { ConflictError } = require('../errors/ConflictError');
 const { UnauthorizedError } = require('../errors/UnauthorizedError');
+const { NotFoundError } = require('../errors/NotFoundError');
 
 const { NODE_ENV, JWT_SECRET_KEY } = process.env;
 
 const MONGO_DUPLICATE_KEY_CODE = 11000;
 const saltRounds = 10;
 
-// eslint-disable-next-line consistent-return
 const createUser = (req, res, next) => {
   const {
     name, password, email,
@@ -18,28 +18,20 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, email, password: hash,
     })
-      .then((user) => {
-        // eslint-disable-next-line no-shadow
-        const {
-          // eslint-disable-next-line no-shadow
-          name, email, _id,
-        } = user;
+      .then(() => {
         res.status(201).send({
-          name, email, _id,
+          name, email,
         });
       }))
-    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.code === MONGO_DUPLICATE_KEY_CODE) {
-        return next(new ConflictError('Пользователь с таким емейлом уже есть.'));
-        // return res.status(409).send({ message: 'Пользователь с таким емейлом уже есть.' });
+        next(new ConflictError('Пользователь с таким емейлом уже есть.'));
+        return;
       }
       next(err);
-      // res.status(500).send({ message: err.name });
     });
 };
 
-// eslint-disable-next-line consistent-return
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
@@ -48,24 +40,32 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'Error') {
         next(new UnauthorizedError('Неправильно введены почта или пароль'));
       }
       next(err);
     });
 };
 
-// eslint-disable-next-line consistent-return
 const updateProfile = (req, res, next) => {
   const { name, email } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      res.status(200).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ConflictError('Переданы некорректные данные'));
-      } else {
-        next(err);
+        return;
       }
+      if (err.code === MONGO_DUPLICATE_KEY_CODE) {
+        next(new ConflictError('Пользователь с таким e-mail уже существует'));
+        return;
+      }
+      next(err);
     });
 };
 

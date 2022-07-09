@@ -15,7 +15,6 @@ const getMovies = (req, res, next) => {
     });
 };
 
-// eslint-disable-next-line consistent-return
 const createMovies = (req, res, next) => {
   const {
     country,
@@ -48,25 +47,20 @@ const createMovies = (req, res, next) => {
     .then((movie) => {
       res.status(201).send(movie);
     })
-    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequest('Неправильный запрос'));
-        // return res.status(400).send({ message: 'Переданы некорректные данные' });
+        next(new BadRequest('Неправильный запрос'));
+        return;
       }
       next(err);
-      // res.status(500).send({ message: 'Server error' });
     });
 };
 
 const deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
-    // eslint-disable-next-line consistent-return
     .then((movie) => {
       if (!movie) {
         throw new NotFoundError('Переданы некорректные данные');
-        // res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-        // return;
       }
       if (movie.owner.toString() === req.user._id) {
         return Movie.deleteOne(movie)
@@ -75,16 +69,13 @@ const deleteMovie = (req, res, next) => {
           });
       }
       return next(new Forbidden('Вы пытались удалить чужой фильм'));
-      // res.status(403).send({ message: 'Чужие карточки удалять нельзя' });
     })
-  // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequest('Неправильный запрос'));
-        // return res.status(400).send({ message: 'Переданы некорректные данные' });
+        next(new BadRequest('Неправильный запрос'));
+        return;
       }
       next(err);
-      // res.status(500).send({ message: 'некорректный id карточки.' });
     });
 };
 

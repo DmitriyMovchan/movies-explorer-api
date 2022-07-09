@@ -7,11 +7,10 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { NotFoundError } = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-// const { isAuthorized } = require('./middlewares/auth');
 
 const app = express();
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DATABASE = 'mongodb://localhost:27017/moviesdb' } = process.env;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -32,15 +31,13 @@ app.get('/crash-test', () => {
 
 app.use(require('./routes/index'));
 
-// eslint-disable-next-line no-shadow
 app.use('*', (req, res, next) => next(new NotFoundError('Запрашиваемая страница не найдена')));
 app.use(errorLogger);
 app.use(errors());
-// eslint-disable-next-line no-unused-vars
+
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
-
   res
     .status(statusCode)
     .send({
@@ -49,9 +46,10 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+  next();
 });
 
-mongoose.connect('mongodb://localhost:27017/moviesdb');
+mongoose.connect(DATABASE);
 
 app.listen(PORT, () => {
 });

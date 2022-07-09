@@ -4,11 +4,11 @@ const { UnauthorizedError } = require('../errors/UnauthorizedError');
 
 const { NODE_ENV, JWT_SECRET_KEY } = process.env;
 
-// eslint-disable-next-line consistent-return
 const isAuthorized = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new UnauthorizedError('Требуется авторизация'));
+    next(new UnauthorizedError('Требуется авторизация'));
+    return;
   }
 
   const token = authorization.replace('Bearer ', '');

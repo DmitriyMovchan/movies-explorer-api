@@ -9,7 +9,7 @@ router.use(require('./user'));
 router.use(require('./movie'));
 
 router.use((req, res, next) => {
-  next(new NotFoundError());
+  next(new NotFoundError('Запрашиваемая страница не найдена'));
 });
 
 module.exports = router;
